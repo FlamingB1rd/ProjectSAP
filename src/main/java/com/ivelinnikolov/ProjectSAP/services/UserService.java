@@ -31,10 +31,19 @@ public class UserService
         }
 
         session.setAttribute("userId", validateUser.getUserId());
-        session.setAttribute("username", validateUser.getUsername());
         session.setAttribute("userRole", validateUser.getAccountType());
 
-        return ResponseEntity.ok("User " + validateUser.getUsername() + " successfully logged in.");
+        String type = null;
+        if (validateUser.getAccountType() == 1)
+        {
+            type = "client";
+        }
+        else
+        {
+            type = "employee";
+        }
+
+        return ResponseEntity.ok("User " + validateUser.getUsername() + " successfully logged in as " + type);
     }
 
 

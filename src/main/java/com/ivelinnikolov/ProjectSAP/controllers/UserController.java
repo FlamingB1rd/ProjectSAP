@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
-import java.util.List;
+
 
 @RestController
 @RequestMapping("/users")
@@ -29,7 +29,7 @@ public class UserController
         {
             return ResponseEntity.status(401).body("Unauthorized!");
         }
-        else if (!session.getAttribute("userRole").equals(2))
+        else if (!session.getAttribute("userRole").equals(2)) // 2 - employee
         {
             return ResponseEntity.status(403).body("Request unavailable for this account.");
         }
@@ -39,9 +39,17 @@ public class UserController
 
     @GetMapping("/individual/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public User getAccount(@PathVariable(name = "id") int id)
+    public ResponseEntity<?> getAccount(@PathVariable(name = "id") int id, HttpSession session)
     {
-        return  userService.getAccountById(id);
+        if (session.getAttribute("userId") == null)
+        {
+            return ResponseEntity.status(401).body("Unauthorized!");
+        }
+        else if (!session.getAttribute("userRole").equals(2)) // 2 - employee
+        {
+            return ResponseEntity.status(403).body("Request unavailable for this account.");
+        }
+        return  ResponseEntity.ok(userService.getAccountById(id));
     }
 
     //-------------------------------------------- POST REQUESTS --------------------------------------------
@@ -56,11 +64,17 @@ public class UserController
     @PostMapping("/login")
     public ResponseEntity<?> logIn(@RequestBody LoginForm loginForm, HttpSession session)
     {
-
-
         User userValidate = new User();
         userValidate.setUsername(loginForm.getUsername());
         userValidate.setPass(loginForm.getPass());
         return userService.logIn(userValidate, session);
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(HttpSession session)
+    {
+        session.invalidate();
+
+        return ResponseEntity.ok("Logged out successfully!");
     }
 }

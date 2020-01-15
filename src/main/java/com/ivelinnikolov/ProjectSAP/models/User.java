@@ -1,10 +1,15 @@
 package com.ivelinnikolov.ProjectSAP.models;
 
+import com.ivelinnikolov.ProjectSAP.exceptions.InvalidAccountTypeException;
+import com.ivelinnikolov.ProjectSAP.exceptions.InvalidEmailException;
+
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.*;
 import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Entity
 @Table(name = "acc")
@@ -18,6 +23,8 @@ public class User
     private String username;
     private String pass;
     private int accountType;
+
+    private static final String PATTERN = "^[_A-Za-z0-9-+]+(.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(.[A-Za-z0-9]+)*(.[A-Za-z]{2,})$";
 
     @Id
     @Column(name = "user_id", nullable = false)
@@ -62,8 +69,14 @@ public class User
         return email;
     }
 
-    public void setEmail(String email)
+    public void setEmail(String email) throws InvalidEmailException
     {
+        Pattern pattern = Pattern.compile(PATTERN);
+        Matcher matcher = pattern.matcher(email);
+        if(!matcher.matches())
+        {
+            throw new InvalidEmailException();
+        }
         this.email = email;
     }
 
@@ -110,9 +123,13 @@ public class User
         return accountType;
     }
 
-    public void setAccountType(int accountType)
+    public void setAccountType(int accountType) throws InvalidAccountTypeException
     {
-        this.accountType = accountType;
+        if (accountType == 1 || accountType == 2)
+        {
+            this.accountType = accountType;
+        }
+        else throw new InvalidAccountTypeException();
     }
 
     @Override

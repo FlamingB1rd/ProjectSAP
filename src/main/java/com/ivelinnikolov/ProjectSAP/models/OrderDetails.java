@@ -1,6 +1,6 @@
 package com.ivelinnikolov.ProjectSAP.models;
-
 import javax.persistence.*;
+import java.util.Date;
 import java.util.Objects;
 
 @Entity
@@ -112,4 +112,5 @@ public class OrderDetails
     {
         return Objects.hash(orderId, dateOfOrder, amount, price, finalPrice);
     }
+
 }
