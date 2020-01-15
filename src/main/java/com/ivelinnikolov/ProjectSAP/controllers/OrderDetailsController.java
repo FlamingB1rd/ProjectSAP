@@ -26,7 +26,7 @@ public class OrderDetailsController
         return orderDetailsService.listAll();
     }
 
-    @GetMapping("/list-by-id/{id}")
+    @GetMapping("/list/{id}")
     @ResponseStatus(HttpStatus.OK)
     public OrderDetails getProduct(@PathVariable(name = "id") int id)
     {
@@ -36,7 +36,7 @@ public class OrderDetailsController
     //-------------------------------------------- POST REQUESTS --------------------------------------------
 
     @PostMapping("/order")
-    public ResponseEntity<?> buyProduct(BuyProduct order)
+    public ResponseEntity<?> buyProduct(@RequestBody BuyProduct order)
     {
         String orderValid = orderDetailsService.buyProduct(order.getClientId(), order.getProductId(), order.getQuantity(), order.getDate());
         //return ResponseEntity.status(201).body(orderValid);

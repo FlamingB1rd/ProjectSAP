@@ -1,5 +1,6 @@
 package com.ivelinnikolov.ProjectSAP.controllers;
 
+import com.ivelinnikolov.ProjectSAP.POJOModels.LoginForm;
 import com.ivelinnikolov.ProjectSAP.models.User;
 import com.ivelinnikolov.ProjectSAP.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 import java.util.List;
 
@@ -21,8 +23,17 @@ public class UserController
 
     @GetMapping("/list")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<List<User>> getAllAccounts()
+    public ResponseEntity<?> getAllAccounts(HttpSession session)
     {
+        if (session.getAttribute("userId") == null)
+        {
+            return ResponseEntity.status(401).body("Unauthorized!");
+        }
+        else if (!session.getAttribute("userRole").equals(2))
+        {
+            return ResponseEntity.status(403).body("Request unavailable for this account.");
+        }
+
         return ResponseEntity.ok(userService.listAll());
     }
 
@@ -37,21 +48,19 @@ public class UserController
 
     @PostMapping("/registration")
     @ResponseStatus(HttpStatus.CREATED)
-    public User createAccount(@Valid @RequestBody User user)
+    public ResponseEntity<?> createAccount(@Valid @RequestBody User user)
     {
-        return userService.createNewAccount(user);
+        return ResponseEntity.ok(userService.createNewAccount(user));
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> logIn(User user)
+    public ResponseEntity<?> logIn(@RequestBody LoginForm loginForm, HttpSession session)
     {
-        User userFromDb = userService.logIn(user);
 
-        if (userFromDb == null)
-        {
-            return ResponseEntity.status(401).body("The username or password is not correct");
-        }
 
-        return ResponseEntity.ok(userFromDb);
+        User userValidate = new User();
+        userValidate.setUsername(loginForm.getUsername());
+        userValidate.setPass(loginForm.getPass());
+        return userService.logIn(userValidate, session);
     }
 }

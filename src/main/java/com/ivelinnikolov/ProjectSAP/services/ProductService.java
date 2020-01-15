@@ -1,5 +1,6 @@
 package com.ivelinnikolov.ProjectSAP.services;
 
+import com.ivelinnikolov.ProjectSAP.exceptions.*;
 import com.ivelinnikolov.ProjectSAP.models.Product;
 import com.ivelinnikolov.ProjectSAP.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,8 +56,20 @@ public class ProductService
     {
         Product product = getProductById(id);
         product.setProductId(id);
-        product.setPrice(price);
-        product.setMinimalPrice(minPrice);
+        try
+        {
+            product.setPrice(price);
+        } catch (InvalidPriceException e)
+        {
+            e.getMessage();
+        }
+        try
+        {
+            product.setMinimalPrice(minPrice);
+        } catch (InvalidPriceException e)
+        {
+            e.getMessage();
+        }
         return productRepository.save(product);
     }
 
@@ -64,7 +77,13 @@ public class ProductService
     {
         Product product = getProductById(id);
         product.setProductId(id);
-        product.setQuantity(newQuantity);
+        try
+        {
+            product.setQuantity(newQuantity);
+        } catch (InvalidQuantityException e)
+        {
+            e.getMessage();
+        }
         return productRepository.save(product);
     }
 
@@ -73,16 +92,49 @@ public class ProductService
         Product product = getProductById(id);
         product.setProductId(id);
         product.setName(updatedProduct.getName());
-        product.setQuantity(updatedProduct.getQuantity());
-        product.setPrice(updatedProduct.getPrice());
-        product.setDiscount(updatedProduct.getDiscount());
-        product.setMinimalPrice(updatedProduct.getMinimalPrice());
+        try
+        {
+            product.setQuantity(updatedProduct.getQuantity());
+        } catch (InvalidQuantityException e)
+        {
+            e.getMessage();
+        }
+        try
+        {
+            product.setPrice(updatedProduct.getPrice());
+        } catch (InvalidPriceException e)
+        {
+            e.getMessage();
+        }
+        try
+        {
+            product.setDiscount(updatedProduct.getDiscount());
+        } catch (InvalidDiscountException e)
+        {
+            e.getMessage();
+        }
+        try
+        {
+            product.setMinimalPrice(updatedProduct.getMinimalPrice());
+        } catch (InvalidPriceException e)
+        {
+            e.getMessage();
+        }
         return productRepository.save(product);
     }
 
     public Product getProductById(int id)
     {
-        return productRepository.findById(id).orElseGet(() -> null); //todo: throw exception instead of null
+        return productRepository.findById(id).orElseGet(() -> {
+            try
+            {
+                throw new NoSuchProductException();
+            } catch (NoSuchProductException e)
+            {
+                e.getMessage();
+                return null;
+            }
+        });
     }
 
 

@@ -131,7 +131,8 @@ public class User
     }
 
     @Override
-    public int hashCode() {
+    public int hashCode()
+    {
         return Objects.hash(userId, fname, lname, email, address, username, pass, accountType);
     }
 }

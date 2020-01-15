@@ -1,5 +1,8 @@
 package com.ivelinnikolov.ProjectSAP.services;
 
+import com.ivelinnikolov.ProjectSAP.exceptions.InvalidQuantityException;
+import com.ivelinnikolov.ProjectSAP.exceptions.NoSuchOrderException;
+import com.ivelinnikolov.ProjectSAP.exceptions.NoSuchUserException;
 import com.ivelinnikolov.ProjectSAP.models.OrderDetails;
 import com.ivelinnikolov.ProjectSAP.models.Product;
 import com.ivelinnikolov.ProjectSAP.models.User;
@@ -28,7 +31,15 @@ public class OrderDetailsService
 
     public OrderDetails getOrderById(int id)
     {
-        return orderDetailsRepository.findById(id).orElseGet(() -> null); //todo: throw exception instead of null
+        return orderDetailsRepository.findById(id).orElseGet(() -> {
+            try
+            {
+                throw new NoSuchOrderException();
+            } catch (NoSuchOrderException e)
+            {
+                return null;
+            }
+        });
     }
 
     public OrderDetails orderAdd(OrderDetails order)
@@ -39,7 +50,10 @@ public class OrderDetailsService
     public String buyProduct(int clientId, int productId, int quantity, String date)
     {
         OrderDetails orderDetails = new OrderDetails();
-        User user = userService.getAccountById(clientId);
+        User user = null;
+
+        user = userService.getAccountById(clientId);
+
         Product product = productService.getProductById(productId);
 
         double orderPrice = quantity * product.getPrice();
@@ -58,7 +72,13 @@ public class OrderDetailsService
         orderDetails.setDateOfOrder(date);
         OrderDetails newOrder = orderAdd(orderDetails);
 
-        product.setQuantity(product.getQuantity() - quantity);
+        try
+        {
+            product.setQuantity(product.getQuantity() - quantity);
+        } catch (InvalidQuantityException e)
+        {
+            e.getMessage();
+        }
         Product newProduct = productService.updateProductById(productId, product);
 
         return "Your order has been successful. It's on it's way to " + user.getAddress() + "!";

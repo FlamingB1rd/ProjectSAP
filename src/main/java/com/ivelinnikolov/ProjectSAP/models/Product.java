@@ -1,5 +1,9 @@
 package com.ivelinnikolov.ProjectSAP.models;
 
+import com.ivelinnikolov.ProjectSAP.exceptions.InvalidDiscountException;
+import com.ivelinnikolov.ProjectSAP.exceptions.InvalidPriceException;
+import com.ivelinnikolov.ProjectSAP.exceptions.InvalidQuantityException;
+
 import javax.persistence.*;
 import java.util.Objects;
 
@@ -45,8 +49,12 @@ public class Product
         return quantity;
     }
 
-    public void setQuantity(int quantity)
+    public void setQuantity(int quantity) throws InvalidQuantityException
     {
+        if (quantity < 0 || quantity == 0)
+        {
+            throw new InvalidQuantityException();
+        }
         this.quantity = quantity;
     }
 
@@ -57,8 +65,12 @@ public class Product
         return price;
     }
 
-    public void setPrice(double price)
+    public void setPrice(double price) throws InvalidPriceException
     {
+        if (price < 0 || price == 0)
+        {
+            throw new InvalidPriceException();
+        }
         this.price = price;
     }
 
@@ -69,8 +81,12 @@ public class Product
         return discount;
     }
 
-    public void setDiscount(int discount)
+    public void setDiscount(int discount) throws InvalidDiscountException
     {
+        if (discount < 0)
+        {
+            throw new InvalidDiscountException();
+        }
         this.discount = discount;
     }
 
@@ -81,8 +97,12 @@ public class Product
         return minimalPrice;
     }
 
-    public void setMinimalPrice(double minimalPrice)
+    public void setMinimalPrice(double minimalPrice) throws InvalidPriceException
     {
+        if (minimalPrice < 0 || minimalPrice == 0)
+        {
+            throw new InvalidPriceException();
+        }
         this.minimalPrice = minimalPrice;
     }
 
