@@ -6,10 +6,10 @@ import com.ivelinnikolov.ProjectSAP.models.OrderDetails;
 import com.ivelinnikolov.ProjectSAP.models.Product;
 import com.ivelinnikolov.ProjectSAP.models.User;
 import com.ivelinnikolov.ProjectSAP.repository.OrderDetailsRepository;
-import org.hibernate.criterion.Order;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -28,6 +28,8 @@ public class OrderDetailsService
 
     @Autowired
     private ProductService productService;
+
+    private static DecimalFormat df = new DecimalFormat("#.##");
 
     public List<OrderDetails> listAll()
     {
@@ -98,8 +100,8 @@ public class OrderDetailsService
         orderDetails.setClientId(clientId);
         orderDetails.setProductId(productId);
         orderDetails.setAmount(quantity);
-        orderDetails.setPrice(orderPrice);
-        orderDetails.setFinalPrice(discountedOrderPrice);
+        orderDetails.setPrice(Double.parseDouble(df.format(orderPrice)));
+        orderDetails.setFinalPrice(Double.parseDouble(df.format(discountedOrderPrice)));
         orderDetails.setDateOfOrder(date);
         OrderDetails newOrder = orderAdd(orderDetails);
 
